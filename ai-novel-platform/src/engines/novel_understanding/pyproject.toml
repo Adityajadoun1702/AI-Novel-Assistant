@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "novel-understanding-ingestion"
+version = "0.1.0"
+description = "TXT ingestion and source-preserving preprocessing for an AI novel platform"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.7,<3",
+  "charset-normalizer>=3.3,<4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.scripts]
+novel-preprocess = "novel_understanding.preprocessing.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

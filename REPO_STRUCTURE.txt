@@ -1,0 +1,58 @@
+Novel Understanding module
+Location: ai-novel-platform/src/engines/novel_understanding/
+
+novel_understanding/
+│
+├── examples/
+│   ├── sample_novel.txt
+│   └── sample_paragraphs.json
+│
+├── real_test/
+│   ├── chapter_01.txt
+│   ├── chapter_02.txt
+│   ├── chapter_03.txt
+│   └── structure_result.json
+│
+├── processed/                         [generated output]
+├── processed_llm_verified/            [generated output]
+│
+├── src/
+│   └── novel_understanding/
+│       ├── __init__.py
+│       │
+│       ├── ingestion/
+│       │   ├── __init__.py
+│       │   ├── chapter_detector.py
+│       │   ├── cli.py
+│       │   ├── document_loader.py
+│       │   ├── encoding_detector.py
+│       │   ├── exceptions.py
+│       │   ├── paragraph_segmenter.py
+│       │   ├── pipeline.py
+│       │   ├── schemas.py
+│       │   ├── structure_request.py
+│       │   ├── text_normalizer.py
+│       │   ├── txt_extractor.py
+│       │   └── validator.py
+│       │
+│       └── preprocessing/
+│           ├── __init__.py
+│           ├── segmenter.py
+│           ├── classifier.py
+│           ├── quote_detector.py
+│           ├── chunker.py
+│           ├── schemas.py
+│           ├── io.py
+│           ├── pipeline.py
+│           ├── validator.py
+│           └── cli.py
+│
+├── tests/
+│   ├── ingestion/
+│   │   └── test_ingestion.py
+│   └── preprocessing/
+│       └── test_preprocessing.py
+│
+├── pyproject.toml
+├── .gitignore
+└── README.md

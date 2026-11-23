@@ -1,0 +1,30 @@
+[
+  {
+    "candidate_id": "DOC_REAL_001_V3_HC0001",
+    "heading_text": "Chapter 1: Confusion",
+    "line_number": 1,
+    "start_offset": 0,
+    "end_offset": 20,
+    "role_hints": [
+      "chapter"
+    ],
+    "detector_version": "heading-candidates-v2",
+    "evidence": [
+      "Matched explicit structural keyword: chapter"
+    ]
+  },
+  {
+    "candidate_id": "DOC_REAL_001_V3_HC0002",
+    "heading_text": "Part 1",
+    "line_number": 56,
+    "start_offset": 5682,
+    "end_offset": 5688,
+    "role_hints": [
+      "part"
+    ],
+    "detector_version": "heading-candidates-v2",
+    "evidence": [
+      "Matched explicit structural keyword: part"
+    ]
+  }
+]

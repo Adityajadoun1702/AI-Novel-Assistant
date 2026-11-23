@@ -1,0 +1,18 @@
+{
+  "document_id": "DOC_REAL_001",
+  "document_name": "chapter_01",
+  "file_name": "chapter_01.txt",
+  "file_format": "txt",
+  "file_hash": "c553a9a90baccd9d16314dbbba3564919e38748c59e2c6f9df542807c20cfbc8",
+  "encoding": "utf-8",
+  "encoding_source": "strict_utf8",
+  "encoding_confidence": 1.0,
+  "had_utf8_bom": false,
+  "language": null,
+  "ingestion_version": 3,
+  "normalization_version": "1.0",
+  "total_characters": 24651,
+  "total_paragraphs": 17,
+  "total_heading_candidates": 2,
+  "ingestion_status": "completed"
+}
