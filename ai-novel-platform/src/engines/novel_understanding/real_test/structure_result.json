@@ -1,0 +1,44 @@
+{
+  "analyzer": "ChatGPT (GPT-6)",
+  "candidate_classifications": [
+    {
+      "candidate_id": "DOC_REAL_001_V3_HC0001",
+      "classification": "chapter",
+      "confidence": 0.99,
+      "rationale": "The explicit heading 'Chapter 1: Confusion' identifies the top-level chapter."
+    },
+    {
+      "candidate_id": "DOC_REAL_001_V3_HC0002",
+      "classification": "part",
+      "confidence": 0.99,
+      "rationale": "The explicit heading 'Part 1' appears inside Chapter 1 and marks a subordinate part, not a second chapter."
+    }
+  ],
+  "units": [
+    {
+      "unit_id": "DOC_REAL_001_CH001",
+      "unit_type": "chapter",
+      "title": "Chapter 1: Confusion",
+      "heading_candidate_id": "DOC_REAL_001_V3_HC0001",
+      "parent_unit_id": null,
+      "order": 1,
+      "start_offset": 0,
+      "end_offset": 24651,
+      "confidence": 0.99,
+      "rationale": "This is the only explicit chapter heading in the supplied document; its range covers the complete chapter text."
+    },
+    {
+      "unit_id": "DOC_REAL_001_CH001_PART001",
+      "unit_type": "part",
+      "title": "Part 1",
+      "heading_candidate_id": "DOC_REAL_001_V3_HC0002",
+      "parent_unit_id": "DOC_REAL_001_CH001",
+      "order": 1,
+      "start_offset": 5682,
+      "end_offset": 24651,
+      "confidence": 0.99,
+      "rationale": "This explicit Part 1 heading occurs within Chapter 1, so it is represented as a child part. No Part 2 heading is present in this source file."
+    }
+  ],
+  "unresolved_candidate_ids": []
+}
