@@ -1,20 +1,45 @@
 import argparse
+
+from .entity_pipeline import EntityExtractionPipeline
 from .integrations.mock_llm import MockLLMAdapter
-from .pipeline import ExtractionPipeline
+from .integrations.ollama_adapter import OllamaAdapter
+
 
 def main():
-    p = argparse.ArgumentParser()
-    p.add_argument("--input-dir", required=True)
-    p.add_argument("--output-dir")
-    p.add_argument("--document-id", required=True)
-    p.add_argument("--version", type=int, default=1)
-    p.add_argument("--max-chunks", type=int)
-    p.add_argument("--mock", action="store_true")
-    args = p.parse_args()
-    if not args.mock:
-        raise SystemExit("No real provider adapter configured. Use --mock for pipeline testing.")
-    result = ExtractionPipeline(MockLLMAdapter()).run(
-        args.input_dir, args.output_dir, args.document_id, args.version, args.max_chunks)
-    print(result)
+    parser = argparse.ArgumentParser(
+        description="Extract entity mentions from preprocessed novel text."
+    )
+    parser.add_argument("--input-dir", required=True, help="Path to preprocessing_vN")
+    parser.add_argument("--output-dir", help="Shared processed output directory")
+    parser.add_argument("--document-id", help="Expected document ID")
+    parser.add_argument("--version", type=int, default=2, help="Extraction version")
+    parser.add_argument("--max-chunks", type=int, help="Optional development limit")
+    parser.add_argument("--model", default="qwen3:4b", help="Local Ollama model")
+    parser.add_argument("--base-url", default="http://localhost:11434", help="Ollama URL")
+    parser.add_argument("--timeout", type=int, default=600, help="Ollama timeout in seconds")
+    parser.add_argument(
+        "--mock",
+        action="store_true",
+        help="Skip semantic extraction and write empty results for pipeline testing",
+    )
+    args = parser.parse_args()
 
-if __name__ == "__main__": main()
+    llm = MockLLMAdapter() if args.mock else OllamaAdapter(
+        model=args.model,
+        base_url=args.base_url,
+        timeout=args.timeout,
+        think=False,
+    )
+    result = EntityExtractionPipeline(llm).run(
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        document_id=args.document_id,
+        version=args.version,
+        max_chunks=args.max_chunks,
+    )
+    print(result)
+    return 0 if result["failed"] == 0 else 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

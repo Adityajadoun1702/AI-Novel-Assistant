@@ -29,14 +29,23 @@ class ExtractionPipeline:
         out.mkdir(parents=True)
         run_id = "EXT_" + uuid.uuid4().hex[:12].upper()
         chunks = data.chunks[:max_chunks] if max_chunks else data.chunks
+        segment_by_id = {item["segment_id"]: item for item in data.segments}
         manifest = {"document_id": data.document_id, "run_id": run_id, "chunks": []}
         self.writer.store.write(out / "manifest.json", manifest)
         totals = {"completed": 0, "failed": 0}
         for chunk in chunks:
             state = {"chunk_id": chunk.chunk_id, "tasks": {}}
             try:
-                candidates = self.detector.detect(chunk.text)
-                ent = self.entity.extract(chunk, candidates)
+                candidates = self.detector.detect(chunk.text).model_dump(mode="json")
+                ent = self.entity.extract(
+                    chunk=chunk,
+                    segments=[segment_by_id[sid] for sid in chunk.segment_ids],
+                    document_id=data.document_id,
+                    normalized_text=data.normalized_text,
+                    run_id=run_id,
+                    extraction_version=version,
+                    candidate_hints=candidates["candidates"],
+                )
                 self._validate(ent.records, data, chunk.chunk_id)
                 p = self.writer.write_task(out, "entities", chunk.chunk_id, "entity", ent)
                 state["tasks"]["entity"] = {"status": "completed", "output": str(Path(p).relative_to(out))}
