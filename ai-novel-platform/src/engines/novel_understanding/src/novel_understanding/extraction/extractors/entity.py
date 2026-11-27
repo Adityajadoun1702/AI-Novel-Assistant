@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from ..schemas.common import ExtractionProvenance, SourceEvidence
@@ -14,7 +15,7 @@ class EntityExtractor:
     """LLM identifies mention semantics; Python resolves IDs and source offsets."""
 
     task = "entity"
-    prompt_version = "entity_v3"
+    prompt_version = "entity_v5"
 
     def __init__(self, llm, prompt_dir=None):
         self.llm = llm
@@ -32,7 +33,6 @@ class EntityExtractor:
         normalized_text: str,
         run_id: str,
         extraction_version: int,
-        candidate_hints: list[dict] | None = None,
     ) -> EntityExtractionResponse:
         prompt = self.prompt_path.read_text(encoding="utf-8")
         segment_payload = []
@@ -54,11 +54,13 @@ class EntityExtractor:
             "document_id": document_id,
             "chunk_id": chunk.chunk_id,
             "segments": segment_payload,
-            "candidate_hints": candidate_hints or [],
             "instructions": (
                 "Return one classification for each distinct (segment_id, exact surface_text, "
                 "entity_type) found. Do not return offsets or occurrence indices. Python will "
-                "find every exact occurrence of each surface_text in its segment."
+                "find every exact occurrence of each surface_text in its segment. Only return "
+                "phrases that refer to a specific person, place, organization, object, animal, "
+                "or group in the story. Exclude ordinary actions, qualities, time or class "
+                "periods, generic narrative concepts, and grammatical fragments."
             ),
         }
         candidate_response = self.llm.generate_structured(
@@ -74,6 +76,12 @@ class EntityExtractor:
         warnings = []
         seen = set()
         for candidate in candidate_response.mentions:
+            candidate_error = self._candidate_error(candidate)
+            if candidate_error:
+                warnings.append(
+                    f"Skipped mention {candidate.surface_text!r}: {candidate_error}"
+                )
+                continue
             segment = segment_by_id.get(candidate.segment_id)
             if segment is None:
                 warnings.append(
@@ -107,10 +115,16 @@ class EntityExtractor:
                 if dedupe_key in seen:
                     continue
                 seen.add(dedupe_key)
+                entity_type = candidate.entity_type
+                mention_kind = candidate.mention_kind
+                if mention_kind == "pronoun" and candidate.surface_text.casefold() in {
+                    "i", "me", "we", "us", "you", "he", "him", "she", "her",
+                }:
+                    entity_type = "person"
 
                 stable_key = (
-                    f"{document_id}|{chunk.chunk_id}|{candidate.segment_id}|"
-                    f"{start}|{end}|{candidate.entity_type}"
+                    f"{document_id}|{chunk.chunk_id}|{candidate.segment_id}|{start}|{end}|"
+                    f"{entity_type}"
                 )
                 mention_id = "MENTION_" + hashlib.sha256(
                     stable_key.encode("utf-8")
@@ -140,8 +154,8 @@ class EntityExtractor:
                     chunk_id=chunk.chunk_id,
                     surface_text=candidate.surface_text,
                     normalized_text=candidate.normalized_text or candidate.surface_text,
-                    entity_type=candidate.entity_type,
-                    mention_kind=candidate.mention_kind,
+                    entity_type=entity_type,
+                    mention_kind=mention_kind,
                     source_evidence=[evidence],
                     provenance=provenance,
                 ))
@@ -152,3 +166,19 @@ class EntityExtractor:
             item.mention_id,
         ))
         return EntityExtractionResponse(records=records, warnings=warnings)
+
+    @staticmethod
+    def _candidate_error(candidate):
+        surface = candidate.surface_text
+        if candidate.mention_kind == "unknown":
+            return "the model could not identify a mention type"
+        if re.search(r"[\r\n.!?\"“”]", surface):
+            return "the output is a sentence or dialogue fragment, not a mention"
+        if len(surface.split()) > 6:
+            return "the output is too long to be a minimal entity mention"
+        if (
+            candidate.entity_type == "other"
+            and candidate.mention_kind == "description"
+        ):
+            return "generic descriptions are not specific entity mentions"
+        return None

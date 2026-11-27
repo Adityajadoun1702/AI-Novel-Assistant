@@ -2,10 +2,12 @@ import uuid
 from pathlib import Path
 
 from .adapters.preprocessing import PreprocessingAdapter
-from .candidate_detection import CandidateDetector
 from .extractors.entity import EntityExtractor
+from .schemas.entity import EntityExtractionResponse
 from .storage_output import OutputWriter
 from .validation import EvidenceValidator
+
+SEGMENTS_PER_REQUEST = 3
 
 
 class EntityExtractionPipeline:
@@ -14,7 +16,6 @@ class EntityExtractionPipeline:
     def __init__(self, llm, input_adapter=None):
         self.llm = llm
         self.adapter = input_adapter or PreprocessingAdapter()
-        self.detector = CandidateDetector()
         self.extractor = EntityExtractor(llm)
         self.evidence_validator = EvidenceValidator()
         self.writer = OutputWriter()
@@ -55,24 +56,49 @@ class EntityExtractionPipeline:
             "failed": 0,
             "mentions": 0,
             "rejected_candidates": 0,
+            "failed_batches": 0,
         }
 
         for chunk in chunks:
             state = {"chunk_id": chunk.chunk_id, "task": "entity", "status": "pending"}
             try:
+                chunk_segments = [segment_by_id[sid] for sid in chunk.segment_ids]
                 chunk_segments = [
-                    segment_by_id[sid] for sid in chunk.segment_ids
+                    segment for segment in chunk_segments
+                    if segment.get("segment_type") != "heading"
+                    and segment.get("paragraph_type") != "heading"
                 ]
-                hints = self.detector.detect(chunk.text).model_dump(mode="json")
-                response = self.extractor.extract(
-                    chunk=chunk,
-                    segments=chunk_segments,
-                    document_id=data.document_id,
-                    normalized_text=data.normalized_text,
-                    run_id=run_id,
-                    extraction_version=version,
-                    candidate_hints=hints.get("candidates", []),
-                )
+                records = []
+                warnings = []
+                successful_batches = 0
+                failed_batches = 0
+                for start in range(0, len(chunk_segments), SEGMENTS_PER_REQUEST):
+                    batch = chunk_segments[start:start + SEGMENTS_PER_REQUEST]
+                    try:
+                        response = self.extractor.extract(
+                            chunk=chunk,
+                            segments=batch,
+                            document_id=data.document_id,
+                            normalized_text=data.normalized_text,
+                            run_id=run_id,
+                            extraction_version=version,
+                        )
+                    except Exception as exc:  # noqa: BLE001 - preserve other batches
+                        failed_batches += 1
+                        warnings.append(
+                            f"Batch starting at segment {batch[0]['segment_id']} failed: "
+                            f"{type(exc).__name__}: {exc}"
+                        )
+                        continue
+                    successful_batches += 1
+                    records.extend(response.records)
+                    warnings.extend(response.warnings)
+
+                if failed_batches and successful_batches == 0:
+                    totals["failed_batches"] += failed_batches
+                    raise RuntimeError("Every entity extraction batch failed")
+
+                response = EntityExtractionResponse(records=records, warnings=warnings)
                 errors = self.evidence_validator.validate(
                     response.records,
                     data.normalized_text,
@@ -93,6 +119,9 @@ class EntityExtractionPipeline:
                 if response.warnings:
                     state["warnings"] = response.warnings
                     totals["rejected_candidates"] += len(response.warnings)
+                if failed_batches:
+                    state["failed_batches"] = failed_batches
+                    totals["failed_batches"] += failed_batches
                 totals["completed"] += 1
                 totals["mentions"] += len(response.records)
             except Exception as exc:  # noqa: BLE001 - record this chunk failure and continue

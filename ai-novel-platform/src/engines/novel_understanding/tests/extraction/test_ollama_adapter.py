@@ -58,6 +58,7 @@ def test_ollama_adapter_sends_schema_and_validates_response(monkeypatch):
     assert captured["body"]["think"] is False
     assert captured["body"]["stream"] is False
     assert captured["body"]["options"]["temperature"] == 0.0
+    assert captured["body"]["options"]["num_predict"] == 2048
     assert captured["body"]["format"]["type"] == "object"
     assert "occurrence_index" not in captured["body"]["format"]["$defs"]["EntityCandidate"]["properties"]
     assert captured["timeout"] == 600

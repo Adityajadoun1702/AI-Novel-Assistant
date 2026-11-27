@@ -1,19 +1,19 @@
 import uuid
 from pathlib import Path
+
 from .adapters.preprocessing import PreprocessingAdapter
-from .candidate_detection import CandidateDetector
+from .extractors.context import ContextExtractor
 from .extractors.entity import EntityExtractor
 from .extractors.event import EventExtractor
 from .extractors.relationship import RelationshipExtractor
-from .extractors.context import ContextExtractor
-from .validation import EvidenceValidator, ReferenceValidator
 from .storage_output import OutputWriter
+from .validation import EvidenceValidator, ReferenceValidator
+
 
 class ExtractionPipeline:
     def __init__(self, llm, input_adapter=None):
         self.llm = llm
         self.adapter = input_adapter or PreprocessingAdapter()
-        self.detector = CandidateDetector()
         self.evidence = EvidenceValidator()
         self.references = ReferenceValidator()
         self.writer = OutputWriter()
@@ -36,7 +36,6 @@ class ExtractionPipeline:
         for chunk in chunks:
             state = {"chunk_id": chunk.chunk_id, "tasks": {}}
             try:
-                candidates = self.detector.detect(chunk.text).model_dump(mode="json")
                 ent = self.entity.extract(
                     chunk=chunk,
                     segments=[segment_by_id[sid] for sid in chunk.segment_ids],
@@ -44,7 +43,6 @@ class ExtractionPipeline:
                     normalized_text=data.normalized_text,
                     run_id=run_id,
                     extraction_version=version,
-                    candidate_hints=candidates["candidates"],
                 )
                 self._validate(ent.records, data, chunk.chunk_id)
                 p = self.writer.write_task(out, "entities", chunk.chunk_id, "entity", ent)
@@ -65,7 +63,7 @@ class ExtractionPipeline:
                 p = self.writer.write_task(out, "narrative_contexts", chunk.chunk_id, "context", ctx)
                 state["tasks"]["context"] = {"status": "completed", "output": str(Path(p).relative_to(out))}
                 state["status"] = "completed"; totals["completed"] += 1
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 - mark this chunk failed and continue
                 state["status"] = "failed"
                 state["error"] = f"{type(exc).__name__}: {exc}"
                 totals["failed"] += 1

@@ -34,7 +34,7 @@ class OllamaAdapter:
             "stream": False,
             "think": self.think,
             "format": schema,
-            "options": {"temperature": temperature},
+            "options": {"temperature": temperature, "num_predict": 2048},
         }
         request = Request(
             f"{self.base_url}/api/chat",

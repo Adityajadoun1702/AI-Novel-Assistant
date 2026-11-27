@@ -92,6 +92,16 @@ class PreprocessingAdapter:
         normalized_text = (ingestion_dir / "normalized.txt").read_text(encoding="utf-8")
         paragraphs = unwrap(read_json(ingestion_dir / "paragraphs.json"), "paragraphs")
         segments = unwrap(read_json(root / "sentence_segments.json"), "segments")
+        annotations = unwrap(
+            read_json(root / "paragraph_annotations.json", False),
+            "paragraph_annotations",
+        )
+        paragraph_types = {
+            item.get("paragraph_id"): item.get("paragraph_type")
+            for item in annotations
+        }
+        for segment in segments:
+            segment["paragraph_type"] = paragraph_types.get(segment.get("paragraph_id"))
         dialogue = unwrap(read_json(root / "dialogue_candidates.json", False), "dialogue_candidates")
         chunks_raw = unwrap(read_json(root / "chunks.json"), "chunks")
 

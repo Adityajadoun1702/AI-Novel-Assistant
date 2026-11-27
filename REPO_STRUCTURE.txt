@@ -17,7 +17,16 @@ AI-Novel-Assistant/
                 │   ├── chapter_02.txt
                 │   ├── chapter_03.txt
                 │   └── structure_result.json
-                ├── processed/                    [generated output]
+                ├── processed/                    [generated ingestion output]
+                │   ├── DOC_REAL_001/
+                │   │   ├── ingestion_v2/
+                │   │   └── preprocessing_v2/
+                │   ├── DOC_REAL_002/
+                │   │   ├── ingestion_v2/
+                │   │   └── preprocessing_v2/
+                │   └── DOC_REAL_003/
+                │       ├── ingestion_v2/
+                │       └── preprocessing_v2/
                 ├── processed_llm_verified/
                 │   └── DOC_REAL_001/
                 │       └── ingestion_v3/
@@ -47,27 +56,17 @@ AI-Novel-Assistant/
                 │   │   │   ├── text_normalizer.py
                 │   │   │   ├── txt_extractor.py
                 │   │   │   └── validator.py
-                │   │   └── novel_preprocessing_engine_v0_1/
-                │   │       └── novel_preprocessing/
-                │   │           ├── .gitignore
-                │   │           ├── README.md
-                │   │           ├── pyproject.toml
-                │   │           ├── examples/
-                │   │           │   └── sample_paragraphs.json
-                │   │           ├── src/
-                │   │           │   └── novel_preprocessing/
-                │   │           │       ├── __init__.py
-                │   │           │       ├── chunker.py
-                │   │           │       ├── classifier.py
-                │   │           │       ├── cli.py
-                │   │           │       ├── io.py
-                │   │           │       ├── pipeline.py
-                │   │           │       ├── quote_detector.py
-                │   │           │       ├── schemas.py
-                │   │           │       ├── segmenter.py
-                │   │           │       └── validator.py
-                │   │           └── tests/
-                │   │               └── test_preprocessing.py
+                │   │   └── novel_preprocessing/
+                │   │       ├── __init__.py
+                │   │       ├── chunker.py
+                │   │       ├── classifier.py
+                │   │       ├── cli.py
+                │   │       ├── io.py
+                │   │       ├── pipeline.py
+                │   │       ├── quote_detector.py
+                │   │       ├── schemas.py
+                │   │       ├── segmenter.py
+                │   │       └── validator.py
                 │   └── novel_understanding_ingestion.egg-info/  [generated metadata]
                 └── tests/
                     ├── ingestion/
