@@ -50,6 +50,22 @@ dialogue candidates, chunks, metadata, and a validation report. Source offsets
 refer to `normalized.txt`; local offsets refer to the paragraph text. Chunk
 token counts are approximations based on character length.
 
+## Extract entity mentions
+
+The extraction pipeline consumes a preprocessing output directory and uses a
+local Ollama model to extract entity mentions. Install/start Ollama and make the
+configured model available locally (default: `qwen3:4b`), then run:
+
+```powershell
+novel-extract --input-dir "processed\DOC_001\preprocessing_v1" --max-chunks 1
+```
+
+Output is written under `processed\DOC_001\extraction_v2\` by default. Use
+`--version` to choose another output version, `--max-chunks` to limit a run, or
+`--model` and `--base-url` to configure Ollama. The entity-only pipeline does
+not yet extract events, relationships, or narrative context. Add `--mock` only
+to test output layout; the mock intentionally returns no entity mentions.
+
 ## Development
 
 ```powershell

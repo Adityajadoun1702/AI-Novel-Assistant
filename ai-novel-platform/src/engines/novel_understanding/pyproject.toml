@@ -17,6 +17,7 @@ dev = ["pytest>=8.0", "ruff>=0.5"]
 
 [project.scripts]
 novel-preprocess = "novel_understanding.preprocessing.cli:main"
+novel-extract = "novel_understanding.extraction.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
