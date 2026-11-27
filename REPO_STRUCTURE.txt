@@ -1,58 +1,76 @@
-Novel Understanding module
-Location: ai-novel-platform/src/engines/novel_understanding/
-
-novel_understanding/
-│
-├── examples/
-│   ├── sample_novel.txt
-│   └── sample_paragraphs.json
-│
-├── real_test/
-│   ├── chapter_01.txt
-│   ├── chapter_02.txt
-│   ├── chapter_03.txt
-│   └── structure_result.json
-│
-├── processed/                         [generated output]
-├── processed_llm_verified/            [generated output]
-│
-├── src/
-│   └── novel_understanding/
-│       ├── __init__.py
-│       │
-│       ├── ingestion/
-│       │   ├── __init__.py
-│       │   ├── chapter_detector.py
-│       │   ├── cli.py
-│       │   ├── document_loader.py
-│       │   ├── encoding_detector.py
-│       │   ├── exceptions.py
-│       │   ├── paragraph_segmenter.py
-│       │   ├── pipeline.py
-│       │   ├── schemas.py
-│       │   ├── structure_request.py
-│       │   ├── text_normalizer.py
-│       │   ├── txt_extractor.py
-│       │   └── validator.py
-│       │
-│       └── preprocessing/
-│           ├── __init__.py
-│           ├── segmenter.py
-│           ├── classifier.py
-│           ├── quote_detector.py
-│           ├── chunker.py
-│           ├── schemas.py
-│           ├── io.py
-│           ├── pipeline.py
-│           ├── validator.py
-│           └── cli.py
-│
-├── tests/
-│   ├── ingestion/
-│   │   └── test_ingestion.py
-│   └── preprocessing/
-│       └── test_preprocessing.py
-│
-├── pyproject.toml
-├── .gitignore
-└── README.md
+AI-Novel-Assistant/
+├── main.py
+├── REPO_STRUCTURE.txt
+├── .venv/                                        [local virtual environment]
+└── ai-novel-platform/
+    └── src/
+        └── engines/
+            └── novel_understanding/
+                ├── .gitignore
+                ├── README.md
+                ├── pyproject.toml
+                ├── examples/
+                │   ├── sample_novel.txt
+                │   └── sample_paragraphs.json
+                ├── real_test/
+                │   ├── chapter_01.txt
+                │   ├── chapter_02.txt
+                │   ├── chapter_03.txt
+                │   └── structure_result.json
+                ├── processed/                    [generated output]
+                ├── processed_llm_verified/
+                │   └── DOC_REAL_001/
+                │       └── ingestion_v3/
+                │           ├── heading_candidates.json
+                │           ├── ingestion_report.json
+                │           ├── metadata.json
+                │           ├── normalized.txt
+                │           ├── original.txt
+                │           ├── paragraphs.json
+                │           ├── structure_analysis.json
+                │           ├── structure_prompt.md
+                │           └── structure_request.json
+                ├── src/
+                │   ├── novel_understanding/
+                │   │   ├── __init__.py
+                │   │   ├── ingestion/
+                │   │   │   ├── __init__.py
+                │   │   │   ├── chapter_detector.py
+                │   │   │   ├── cli.py
+                │   │   │   ├── document_loader.py
+                │   │   │   ├── encoding_detector.py
+                │   │   │   ├── exceptions.py
+                │   │   │   ├── paragraph_segmenter.py
+                │   │   │   ├── pipeline.py
+                │   │   │   ├── schemas.py
+                │   │   │   ├── structure_request.py
+                │   │   │   ├── text_normalizer.py
+                │   │   │   ├── txt_extractor.py
+                │   │   │   └── validator.py
+                │   │   └── novel_preprocessing_engine_v0_1/
+                │   │       └── novel_preprocessing/
+                │   │           ├── .gitignore
+                │   │           ├── README.md
+                │   │           ├── pyproject.toml
+                │   │           ├── examples/
+                │   │           │   └── sample_paragraphs.json
+                │   │           ├── src/
+                │   │           │   └── novel_preprocessing/
+                │   │           │       ├── __init__.py
+                │   │           │       ├── chunker.py
+                │   │           │       ├── classifier.py
+                │   │           │       ├── cli.py
+                │   │           │       ├── io.py
+                │   │           │       ├── pipeline.py
+                │   │           │       ├── quote_detector.py
+                │   │           │       ├── schemas.py
+                │   │           │       ├── segmenter.py
+                │   │           │       └── validator.py
+                │   │           └── tests/
+                │   │               └── test_preprocessing.py
+                │   └── novel_understanding_ingestion.egg-info/  [generated metadata]
+                └── tests/
+                    ├── ingestion/
+                    │   └── test_ingestion.py
+                    └── preprocessing/
+                        └── test_preprocessing.py
