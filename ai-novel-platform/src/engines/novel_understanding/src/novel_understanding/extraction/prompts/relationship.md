@@ -1,0 +1,1 @@
+Extract relationships between supplied entity mentions only when supported by the current chunk. Do not mistake temporary event participation or a conversation for persistent friendship, trust, hostility or kinship. Preserve uncertainty and cite exact evidence. Follow the supplied response schema exactly.

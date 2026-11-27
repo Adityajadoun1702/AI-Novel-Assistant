@@ -1,0 +1,1 @@
+Describe the narrative situation in the current chunk. Reference supplied entity and event IDs. Do not invent scenario IDs, canonical character IDs or scene boundaries. Preserve ambiguity and cite exact evidence. Follow the supplied response schema exactly.

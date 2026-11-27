@@ -1,0 +1,1 @@
+Extract events supported by the current chunk. Identify actions, interactions, decisions, discoveries and incidents. Link participants only to supplied entity mention IDs. Distinguish explicit, inferred and uncertain events. Every event needs exact source evidence. Do not invent participants or locations. Follow the supplied response schema exactly.

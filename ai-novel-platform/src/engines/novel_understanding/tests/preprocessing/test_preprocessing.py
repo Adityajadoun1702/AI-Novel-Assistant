@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from novel_preprocessing.pipeline import PreprocessingPipeline
-from novel_preprocessing.segmenter import split_sentences
-from novel_preprocessing.quote_detector import find_quoted_spans
+from novel_understanding.preprocessing.pipeline import PreprocessingPipeline
+from novel_understanding.preprocessing.pipeline import split_sentences
+from novel_understanding.preprocessing.pipeline import find_quoted_spans
 
 
 def make_ingestion(tmp_path: Path):
